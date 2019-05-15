@@ -364,6 +364,28 @@ void Environment::PrintSyncTrace() const {
   fflush(stderr);
 }
 
+
+// Remember to keep this code aligned with pushAsyncIds() in JS.
+void Environment::AsyncHooks::push_async_ids(double async_id,
+                                             double trigger_async_id) {
+  // Since async_hooks is experimental, do only perform the check
+  // when async_hooks is enabled.
+  if (fields_[kCheck] > 0) {
+    CHECK_GE(async_id, -1);
+    CHECK_GE(trigger_async_id, -1);
+  }
+
+  uint32_t offset = fields_[kStackLength];
+  if (offset * 2 >= async_ids_stack_.Length())
+    grow_async_ids_stack();
+  async_ids_stack_[2 * offset] = async_id_fields_[kExecutionAsyncId];
+  async_ids_stack_[2 * offset + 1] = async_id_fields_[kTriggerAsyncId];
+  fields_[kStackLength] += 1;
+  async_id_fields_[kExecutionAsyncId] = async_id;
+  async_id_fields_[kTriggerAsyncId] = trigger_async_id;
+}
+
+
 void Environment::RunCleanup() {
   CleanupHandles();
 

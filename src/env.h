@@ -471,7 +471,7 @@ class Environment {
     inline void no_force_checks();
     inline Environment* env();
 
-    inline void push_async_ids(double async_id, double trigger_async_id);
+    void push_async_ids(double async_id, double trigger_async_id);
     inline bool pop_async_id(double async_id);
     inline void clear_async_id_stack();  // Used in fatal exceptions.
 
