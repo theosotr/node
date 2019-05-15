@@ -395,6 +395,11 @@ void AsyncWrap::GetAsyncId(const FunctionCallbackInfo<Value>& args) {
   args.GetReturnValue().Set(wrap->get_async_id());
 }
 
+void AsyncWrap::NewAsyncId(const FunctionCallbackInfo<Value>& args) {
+  Environment* env = Environment::GetCurrent(args);
+  double async_id = env->new_async_id();
+  args.GetReturnValue().Set(async_id);
+}
 
 void AsyncWrap::PushAsyncIds(const FunctionCallbackInfo<Value>& args) {
   Environment* env = Environment::GetCurrent(args);
@@ -451,6 +456,7 @@ void AsyncWrap::Initialize(Local<Object> target,
   env->BeforeExit(DestroyAsyncIdsCallback, env);
 
   env->SetMethod(target, "setupHooks", SetupHooks);
+  env->SetMethod(target, "newAsyncId", NewAsyncId);
   env->SetMethod(target, "pushAsyncIds", PushAsyncIds);
   env->SetMethod(target, "popAsyncIds", PopAsyncIds);
   env->SetMethod(target, "queueDestroyAsyncId", QueueDestroyAsyncId);
