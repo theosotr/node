@@ -472,7 +472,7 @@ class Environment {
     inline Environment* env();
 
     void push_async_ids(double async_id, double trigger_async_id);
-    inline bool pop_async_id(double async_id);
+    bool pop_async_id(double async_id);
     inline void clear_async_id_stack();  // Used in fatal exceptions.
 
     // Used to set the kDefaultTriggerAsyncId in a scope. This is instead of

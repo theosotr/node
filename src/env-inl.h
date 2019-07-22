@@ -120,38 +120,6 @@ inline Environment* Environment::AsyncHooks::env() {
   return Environment::ForAsyncHooks(this);
 }
 
-// Remember to keep this code aligned with popAsyncIds() in JS.
-inline bool Environment::AsyncHooks::pop_async_id(double async_id) {
-  // In case of an exception then this may have already been reset, if the
-  // stack was multiple MakeCallback()'s deep.
-  if (fields_[kStackLength] == 0) return false;
-
-  // Ask for the async_id to be restored as a check that the stack
-  // hasn't been corrupted.
-  // Since async_hooks is experimental, do only perform the check
-  // when async_hooks is enabled.
-  if (fields_[kCheck] > 0 && async_id_fields_[kExecutionAsyncId] != async_id) {
-    fprintf(stderr,
-            "Error: async hook stack has become corrupted ("
-            "actual: %.f, expected: %.f)\n",
-            async_id_fields_.GetValue(kExecutionAsyncId),
-            async_id);
-    DumpBacktrace(stderr);
-    fflush(stderr);
-    if (!env()->abort_on_uncaught_exception())
-      exit(1);
-    fprintf(stderr, "\n");
-    fflush(stderr);
-    ABORT_NO_BACKTRACE();
-  }
-
-  uint32_t offset = fields_[kStackLength] - 1;
-  async_id_fields_[kExecutionAsyncId] = async_ids_stack_[2 * offset];
-  async_id_fields_[kTriggerAsyncId] = async_ids_stack_[2 * offset + 1];
-  fields_[kStackLength] = offset;
-
-  return fields_[kStackLength] > 0;
-}
 
 // Keep in sync with clearAsyncIdStack in lib/internal/async_hooks.js.
 inline void Environment::AsyncHooks::clear_async_id_stack() {
