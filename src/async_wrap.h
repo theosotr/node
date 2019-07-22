@@ -119,6 +119,7 @@ class AsyncWrap : public BaseObject {
                          v8::Local<v8::Value> unused,
                          v8::Local<v8::Context> context);
 
+  static void NewTickInfo(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void GetAsyncId(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void NewAsyncId(const v8::FunctionCallbackInfo<v8::Value>& args);
   static void PushAsyncIds(const v8::FunctionCallbackInfo<v8::Value>& args);

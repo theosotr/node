@@ -130,7 +130,7 @@ void Emit(Environment* env, double async_id, AsyncHooks::Fields type,
 }
 
 
-void AsyncWrap::EmitPromiseResolve(Environment* env, double async_id) {
+__attribute__((noinline)) void AsyncWrap::EmitPromiseResolve(Environment* env, double async_id) {
   Emit(env, async_id, AsyncHooks::kPromiseResolve,
        env->async_hooks_promise_resolve_function());
 }
@@ -388,6 +388,13 @@ static void RegisterDestroyHook(const FunctionCallbackInfo<Value>& args) {
 }
 
 
+void AsyncWrap::NewTickInfo(const FunctionCallbackInfo<Value>& args) {
+  Environment* env = Environment::GetCurrent(args);
+  Local<String> tick_info = String::NewFromUtf8(env->isolate(), "TickObject",
+      NewStringType::kNormal).ToLocalChecked();
+  args.GetReturnValue().Set(tick_info);
+}
+
 void AsyncWrap::GetAsyncId(const FunctionCallbackInfo<Value>& args) {
   AsyncWrap* wrap;
   args.GetReturnValue().Set(-1);
@@ -456,6 +463,7 @@ void AsyncWrap::Initialize(Local<Object> target,
   env->BeforeExit(DestroyAsyncIdsCallback, env);
 
   env->SetMethod(target, "setupHooks", SetupHooks);
+  env->SetMethod(target, "newTickInfo", NewTickInfo);
   env->SetMethod(target, "newAsyncId", NewAsyncId);
   env->SetMethod(target, "pushAsyncIds", PushAsyncIds);
   env->SetMethod(target, "popAsyncIds", PopAsyncIds);
